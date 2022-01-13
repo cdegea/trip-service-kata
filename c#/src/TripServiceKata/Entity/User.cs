@@ -7,7 +7,7 @@ namespace TripServiceKata.Entity
     {
         private readonly List<User> friends = new List<User>();
 
-        public List<User> GetFriends()
+        public virtual List<User> GetFriends()
         {
             return friends;
         }
@@ -17,7 +17,7 @@ namespace TripServiceKata.Entity
             friends.Add(user);
         }
 
-        public List<Trip> FindTripsByUser()
+        public virtual List<Trip> FindTripsByUser()
         {
             throw new DependendClassCallDuringUnitTestException(
                 "TripDAO should not be invoked on an unit test.");
