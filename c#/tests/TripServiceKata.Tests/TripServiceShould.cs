@@ -1,5 +1,6 @@
 ﻿using Moq;
 using System.Collections.Generic;
+using NSubstitute.ReturnsExtensions;
 using TripServiceKata.Entity;
 using TripServiceKata.Service;
 using Xunit;
@@ -8,12 +9,31 @@ namespace TripServiceKata.Tests
 {
     public class TripServiceShould
     {
+        private readonly IUserSession userSession = Mock.Of<IUserSession>();
+        private readonly User user = Mock.Of<User>();
+        private readonly TripService tripsService;
+        private readonly List<Trip> expectedTrips;
+        private readonly List<User> expectedFriends;
+
+        public TripServiceShould()
+        {
+            tripsService = new TripService(userSession, user);
+            expectedTrips = new List<Trip>
+            {
+                new Trip(), new Trip()
+            };
+            expectedFriends = new List<User>
+            {
+                new User(), user
+            };
+        }
+
         [Fact]
         public void returns_an_empty_trip_list_when_user_not_exists()
         {
-            var userSession = Mock.Of<IUserSession>();
-            var tripsService = new TripService(userSession, new User());
             Mock.Get(userSession).Setup(us => us.GetLoggedUser()).Returns(new User());
+            Mock.Get(user).Setup(us => us.GetFriends()).Returns(expectedFriends);
+            Mock.Get(user).Setup(us => us.FindTripsByUser()).Returns(expectedTrips);
 
             var trips = tripsService.GetTripsByUser();
 
@@ -23,18 +43,6 @@ namespace TripServiceKata.Tests
         [Fact]
         public void returns_two_trips_when_user_exists_and_its_in_friends_list()
         {
-            var userSession = Mock.Of<IUserSession>();
-            var user = Mock.Of<User>();
-            var tripsService = new TripService(userSession, user);
-            var expectedTrips = new List<Trip>
-            {
-                new Trip(), new Trip()
-            };
-            var expectedFriends = new List<User>
-            {
-                new User(), user
-            };
-
             Mock.Get(userSession).Setup(us => us.GetLoggedUser()).Returns(user);
             Mock.Get(user).Setup(us => us.GetFriends()).Returns(expectedFriends);
             Mock.Get(user).Setup(us => us.FindTripsByUser()).Returns(expectedTrips);
