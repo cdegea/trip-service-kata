@@ -8,13 +8,15 @@ namespace TripServiceKata
     public class TripService
     {
         private readonly IUserSession userSession;
+        private readonly User user;
 
-        public TripService(IUserSession userSession)
+        public TripService(IUserSession userSession, User user)
         {
             this.userSession = userSession;
+            this.user = user;
         }
 
-        public List<Trip> GetTripsByUser(User user)
+        public List<Trip> GetTripsByUser()
         {
             var tripList = new List<Trip>();
             var loggedUser = userSession.GetLoggedUser();
