@@ -1,7 +1,7 @@
-﻿using Moq;
-using System.Collections.Generic;
-using NSubstitute.ReturnsExtensions;
+﻿using System.Collections.Generic;
+using Moq;
 using TripServiceKata.Entity;
+using TripServiceKata.Exception;
 using TripServiceKata.Service;
 using Xunit;
 
@@ -9,11 +9,11 @@ namespace TripServiceKata.Tests
 {
     public class TripServiceShould
     {
-        private readonly IUserSession userSession = Mock.Of<IUserSession>();
-        private readonly User user = Mock.Of<User>();
-        private readonly TripService tripsService;
-        private readonly List<Trip> expectedTrips;
         private readonly List<User> expectedFriends;
+        private readonly List<Trip> expectedTrips;
+        private readonly TripService tripsService;
+        private readonly User user = Mock.Of<User>();
+        private readonly IUserSession userSession = Mock.Of<IUserSession>();
 
         public TripServiceShould()
         {
@@ -55,6 +55,18 @@ namespace TripServiceKata.Tests
             var trips = tripsService.GetTripsByUser();
 
             Assert.True(trips.Count == 0);
+        }
+
+        [Fact]
+        public void returns_an_empty_trip_list_when_user_not_exists()
+        {
+            Mock.Get(userSession).Setup(us => us.GetLoggedUser()).Returns((User) null);
+            Mock.Get(user).Setup(us => us.GetFriends()).Returns(expectedFriends);
+            Mock.Get(user).Setup(us => us.FindTripsByUser()).Returns(expectedTrips);
+
+            Assert.Throws<UserNotLoggedInException>(
+                () => tripsService.GetTripsByUser()
+            );
         }
     }
 }
