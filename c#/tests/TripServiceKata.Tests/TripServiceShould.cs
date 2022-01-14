@@ -29,18 +29,6 @@ namespace TripServiceKata.Tests
         }
 
         [Fact]
-        public void returns_an_empty_trip_list_when_user_not_exists()
-        {
-            Mock.Get(userSession).Setup(us => us.GetLoggedUser()).Returns(new User());
-            Mock.Get(user).Setup(us => us.GetFriends()).Returns(expectedFriends);
-            Mock.Get(user).Setup(us => us.FindTripsByUser()).Returns(expectedTrips);
-
-            var trips = tripsService.GetTripsByUser();
-
-            Assert.True(trips.Count == 0);
-        }
-
-        [Fact]
         public void returns_two_trips_when_user_exists_and_its_in_friends_list()
         {
             Mock.Get(userSession).Setup(us => us.GetLoggedUser()).Returns(user);
@@ -50,6 +38,23 @@ namespace TripServiceKata.Tests
             var trips = tripsService.GetTripsByUser();
 
             Assert.True(trips.Count == 2);
+        }
+
+        [Fact]
+        public void returns_an_empty_trip_list_when_user_exists_and_its_not_in_friends_list()
+        {
+            var friends = new List<User>
+            {
+                new User(), new User()
+            };
+
+            Mock.Get(userSession).Setup(us => us.GetLoggedUser()).Returns(user);
+            Mock.Get(user).Setup(us => us.GetFriends()).Returns(friends);
+            Mock.Get(user).Setup(us => us.FindTripsByUser()).Returns(expectedTrips);
+
+            var trips = tripsService.GetTripsByUser();
+
+            Assert.True(trips.Count == 0);
         }
     }
 }
