@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TripServiceKata.Exception;
 
 namespace TripServiceKata.Entity
@@ -21,6 +22,11 @@ namespace TripServiceKata.Entity
         {
             throw new DependendClassCallDuringUnitTestException(
                 "TripDAO should not be invoked on an unit test.");
+        }
+
+        public bool IsFriend(User loggedUser)
+        {
+            return Enumerable.Contains(this.GetFriends(), loggedUser);
         }
     }
 }
